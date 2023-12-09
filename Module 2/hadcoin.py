@@ -153,11 +153,35 @@ def test():
     return "test"
 
 @app.route('/is_valid', methods = ['GET'])
-def get_chain():
-    response = {
-                'is_valid': blockchain.is_chain_valid(blockchain.chain),
-                
-                }
+def is_valid():
+    is_valid = blockchain.is_chain_valid(blockchain.chain)
+    if is_valid:
+        response = {'message': 'All good the Blockchain is valid'}
+    else:
+        response = {'message:' 'There is a problem'}
     return jsonify(response), 200
 
+# connecting new nodes
+@app.route('/connect_node', methods = ['POST'])
+def connect_node():
+    json = request.get_json()
+    json.get('nodes')
+    if nodes is None:
+        return "No node", 400
+    for node in nodes:
+        blockchain.add_node(node)
+    response = {'message': 'All the nodes are nodes are now connected. The Blockchain now contains the nodes:',
+                'total_nodes': list(blockchain.nodes)}
+    return jsonify(response), 201
+
+
+# Replacing the chain by the longest chain if needed
+@app.route('/replace_chain', methods = ['GET'])
+def replace_chain():
+    is_chain_replaced = blockchain.replace_chain()
+    if is_chain_replaced:
+        response = {'message': 'Chain was replaced'}
+    else:
+        response = {'message:' 'Was not changed'}
+    return jsonify(response), 200
 app.run(host = '0.0.0.0', port = 5001)
